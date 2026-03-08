@@ -1,3 +1,4 @@
+```markdown
 # Regularization in Linear Regression
 
 This project studies how regularization changes linear regression behavior in two settings:
@@ -45,193 +46,196 @@ Main sklearn tools used:
 
 ## A function for showing evaluation metrics
 
-A helper function is used to print standard regression metrics for each model:
+The notebook defines a helper function that prints standard regression metrics for each model:
 
 - explained variance
-- `R^2`
-- mean absolute error
-- mean squared error
-- root mean squared error
+- R^2
+- MAE
+- MSE
+- RMSE
 
-This makes it easier to compare the three regression models under the same setup.
+These are used throughout the notebook to compare ordinary linear regression, Ridge, and Lasso in a consistent way.
+
+Plain formulas:
+
+- MAE = (1/n) * sum |y_i - yhat_i|
+- MSE = (1/n) * sum (y_i - yhat_i)^2
+- RMSE = sqrt(MSE)
+- R^2 = 1 - (sum (y_i - yhat_i)^2) / (sum (y_i - ybar)^2)
+
+where:
+
+- `y_i` is the true target
+- `yhat_i` is the prediction
+- `ybar` is the mean of the true targets
+- `n` is the number of samples
 
 ---
 
 ## Part 1: Simple linear regression with outliers
 
-## Fit Ordinary, Ridge, and Lasso regression models then predicting on outliers.
-
-The notebook first creates synthetic one-feature data with an ideal linear relationship plus noise.
-
-Plain form of the data generation:
+The first part of the notebook creates synthetic data with one feature using a linear relationship of the form:
 
 `y = 4 + 3x + noise`
 
-and the ideal noise-free line is:
+and also defines the noise-free ideal line:
 
 `y_ideal = 4 + 3x`
 
-Then a small number of artificial outliers are added to the target values for some points with larger `x` values.
+Then a small number of large outliers are injected into points with larger `x` values. This makes it possible to compare how sensitive each regression method is to unusual observations.
 
-### What the outlier code is doing
+### Data generation
 
-- `X` has one feature only
-- `y` is generated from a linear relationship with random noise
-- points with `X > 1.5` are eligible for outlier injection
-- exactly `5` indices are selected
-- large positive values are added to those `y` values
+The notebook:
 
-So the threshold in that part is **not** detecting outliers statistically. It is only choosing **where to inject artificial outliers**.
+- generates 1000 samples
+- uses one predictor
+- adds Gaussian noise
+- creates a clean ideal target
+- injects 5 artificial outliers into selected points above a threshold
+
+This gives two target versions:
+
+- `y`: original noisy data without injected outliers
+- `y_outlier`: same data after adding artificial outliers
+
+### Original data plots
+
+#### Original data with outliers
+
+![Original data with outliers](original-with-outlier.png)
+
+#### Original data without outliers
+
+![Original data without outliers](original-without-outlier.png)
+
+These two plots show the baseline data and make the outlier effect visually clear.
 
 ---
 
-## Plotting data and predictions
+## Fit Ordinary, Ridge, and Lasso regression models then predicting on outliers.
 
-### Data without outliers
+Three models are fit on the one-feature dataset with outliers:
 
-The plot below shows the original noisy one-feature data together with the ideal line:
+- **Ordinary Linear Regression**
+- **Ridge Regression**
+- **Lasso Regression**
 
-![Original data without outliers](images/original-without-outlier.png)
+Their prediction functions are:
 
-### Data with outliers
+- Ordinary linear regression: `yhat = b0 + b1 x`
+- Ridge: minimize  
+  `sum (y_i - yhat_i)^2 + alpha * sum w_j^2`
+- Lasso: minimize  
+  `sum (y_i - yhat_i)^2 + alpha * sum |w_j|`
 
-The next plot shows the same dataset after adding a few large outliers:
+For one feature, the regularization still affects the fitted slope and intercept indirectly by penalizing coefficient size.
 
-![Original data with outliers](images/original-with-outlier.png)
+Ridge uses an L2 penalty, so it shrinks coefficients smoothly.  
+Lasso uses an L1 penalty, so it can shrink more aggressively and, in higher dimensions, can even force coefficients to zero.
 
-### Prediction comparison with outliers
+### Plotting data and predictions
 
-The three regression models are fitted on the outlier-corrupted data and plotted against the original relationship:
-
-![Comparison of predictions with outliers](images/compare-predictions-with-outlier.png)
-
-### Prediction comparison without outliers
-
-The same models are then fitted on the clean data for comparison:
-
-![Comparison of predictions without outliers](images/compare-predictions-without-outlier.png)
+![Comparison of predictions with outliers](compare-predictions-with-outlier.png)
 
 We can see that ordinary linear and ridge regression performed similarly, while Lasso outperformed both.  
-Although the intercept is off for the Lasso fit line, its slope is much closer to the ideal than the other fit lines.  
-All three lines were pulled up by the outliers, with Lasso dampening that effect.
+<br>  
+Although the intercept is off for the Lasso fit line, it's slope is much closer to the ideal than the other fit lines.  
+<br>  
+All three lines were 'pulled up' by the outliers (not plotted here - compare to the plot above where the outliers are shown), with Lasso dampening that effect.
 
-### Interpretation
+### Same comparison without outliers
 
-In simple words:
+![Comparison of predictions without outliers](compare-predictions-without-outlier.png)
 
-- **Ordinary Linear Regression** tries to fit all points directly, so extreme outliers pull the line upward.
-- **Ridge Regression** adds an `L2` penalty and shrinks coefficients, but in the one-feature outlier case it still behaves similarly to ordinary regression.
-- **Lasso Regression** adds an `L1` penalty and can be more resistant to the effect of those outliers in this example.
+When the outliers are removed, all three models are much closer to one another, which shows that the first comparison is really about robustness to abnormal points rather than just raw fitting ability.
 
 ---
 
-## Part 2: Multiple regression regularization and lasso feature selection
+## Multiple regression regularization and lasso feature selection
 
-### Multiple regression regularization and lasso feature selection
-
-Here I compare performances of the three linear regression methods and then use the Lasso result to select important features to use in another model.
+Here I compare performances of the three linear regression methods and then use the Lasso result to select important features to use in another model.<br>
 
 Note that:
-
 - Simple linear regression: one predictor  
-  `y = b0 + b1 x1`
+`y = b0 + b1 x1`
 - Multiple linear regression: two or more predictors  
-  `y = b0 + b1 x1 + b2 x2 + ... + bk xk`
+`y = b0 + b1 x1 + b2 x2 + ... + bk xk`
 
-### Synthetic regression data
+### Creating synthetic regression data:
 
-Creating synthetic regression data:
+`n_samples=100` → create 100 data points
 
-- `n_samples=100` -> create 100 data points
-- `n_features=100` -> each point has 100 input features
-- `n_informative=10` -> only 10 of those 100 features actually matter
-- `noise=10` -> add random noise to the target values
-- `random_state=42` -> makes the result reproducible
-- `coef=True` -> also return the true underlying coefficients
+`n_features=100` → each point has 100 input features
+
+`n_informative=10` → only 10 of those 100 features actually matter
+
+`noise=10` → add random noise to the target values
+
+`random_state=42` → makes the result reproducible
+
+`coef=True` → also return the true underlying coefficients
 
 The data is built roughly like this, suitable for regression:
 
 `y = b + w1*x1 + w2*x2 + ... + wk*xk + noise`
 
-This is called a regression dataset because the target `y` is continuous, and the task is to learn the mapping from features to numeric output.
-
-### Why `coef=True` matters
-
-The dataset is synthetic, so the generator knows the true coefficients used to build the target.  
-That means we can compare:
-
-- learned coefficients from Linear / Ridge / Lasso
-- true hidden coefficients from the data generator
-
-This gives a direct way to check whether a model recovered the real signal.
+This setup is useful because the notebook knows the true underlying coefficient vector `ideal_coef`, so the fitted coefficients from each model can be compared directly against the ground truth.
 
 ---
 
-## First multiple-regression comparison
+## Multiple-regression model comparison
 
-The three models are trained on the full 100-feature dataset and evaluated on a held-out test set.
+The notebook splits the data into training and testing sets, then fits:
+
+- `LinearRegression()`
+- `Ridge(alpha=1.0)`
+- `Lasso(alpha=0.1)`
+
+on the full 100-feature dataset.
 
 ### Prediction vs actual plots
 
-![Multiple regression prediction vs actual](images/multiple-regression-predictionVSactual.png)
+![Multiple regression prediction vs actual](multiple-regression-predictionVSactual.png)
 
-### Additional final comparison plot
-
-![Final comparison plot](images/last-plot-comparison.png)
-
-The results for ordinary and ridge regression are poor.  
-Explained variances are under 50%, and `R^2` is very low.  
+The results for ordinary and ridge regession are poor.<br>
+Explained variances are under 50%, and R^2 is very low.<br>
 However, the result for Lasso is stellar.
 
-### Interpretation
-
-This happens because:
-
-- the dataset has many irrelevant features
-- only 10 of the 100 features actually matter
-- ordinary regression can fit too much noise
-- Ridge helps by shrinking coefficients
-- Lasso helps even more because it can shrink some coefficients all the way to zero, effectively performing feature selection
+This figure shows that the Lasso predictions align much more closely with the diagonal reference line, meaning its predicted values are much closer to the actual targets.
 
 ---
 
 ## Model coefficients
 
-The notebook then compares the learned coefficients with the true ideal coefficients.
+The notebook next compares estimated coefficients to the true coefficients used to generate the data.
 
-![Model coefficients](images/model-coefficients.png)
+![Comparison of model coefficients](model-coefficients.png)
 
-![Model coefficient residuals](images/model-coefficients-residuals.png)
+This is one of the most important parts of the project. Since only 10 of the 100 features are truly informative, a good model should identify the important coefficients and avoid assigning large weights to irrelevant features.
+
+Ridge usually shrinks coefficients but keeps many of them nonzero.  
+Lasso tends to produce a sparser solution, which is why it is especially useful for feature selection.
+
+### Coefficient residuals
+
+![Coefficient residuals](model-coefficients-residuals.png)
 
 We can see from the first plot how much closer the Lasso coefficients are to the ideal coefficients than for the other two models. An easier way to visualize the difference is to look at the residual errors, as in the second plot. Clearly the Lasso coefficient residuals are much closer to zero than the others.
 
-### Plain math for the coefficient comparison
+In plain terms, the residual for a coefficient is:
 
-If `w_true` is the ideal coefficient vector and `w_model` is a learned coefficient vector, then the residual coefficient error is:
+`coefficient residual = estimated coefficient - ideal coefficient`
 
-`residual = w_true - w_model`
-
-Smaller residuals mean the learned coefficients are closer to the true underlying signal.
+Smaller residuals mean the model recovered the true structure of the data more accurately.
 
 ---
 
 ## Using Lasso to select most important features
 
-### Using Lasso to select most important features
+### Part A: Choosing a threshold value to select features based on the Lasso coefficients
 
-Part A: Choosing a threshold value to select features based on the Lasso coefficients
-
-A threshold is chosen by visually inspecting the Lasso coefficient residual plot. Features with sufficiently large absolute Lasso coefficients are treated as important.
-
-The notebook uses:
-
-`threshold = 5`
-
-and selects features using the rule:
-
-`abs(lasso_coefficient) > threshold`
-
-### What I do in below codes:
+What I do in below codes:
 
 1. **Fit a Lasso model**
    - Lasso gives a coefficient for each feature.
@@ -257,158 +261,126 @@ So:
 
 Use Lasso to guess which features matter, then compare its guess with the real answer.
 
-### What is being extracted
+The notebook uses:
 
-The code is **not extracting coefficients** for later training.  
-It is extracting **feature columns from `X`**.
+`threshold = 5`
 
-If `important_features` contains selected column indices, then:
+and selects features satisfying:
 
-`X_filtered = X[:, important_features]`
+`|lasso coefficient| > threshold`
 
-means:
-
-- keep all rows
-- keep only the selected feature columns
-
-So Lasso coefficients are used only to decide **which variables to keep**.
+This produces a reduced feature set consisting only of features considered important by Lasso.
 
 ---
 
 ## Using the threshold to select the most important features for use in modelling
 
-Part B: splitting data
+### Part B: splitting data
 
-After selecting important feature indices, the notebook builds a reduced design matrix using only those selected columns.
+After selecting the important feature indices, the notebook filters the original feature matrix and creates a smaller dataset:
 
-The printed shape is:
+- original shape: 100 features
+- filtered shape: only the selected important features
 
-`(100, 10)`
+Then it performs a new train/test split on this reduced feature set.
 
-So the final filtered dataset contains:
+### Part C: fit and apply models to those features
 
-- `100` samples
-- `10` selected features
+The same three models are retrained on the filtered data:
 
-This is consistent with the synthetic setup, since the dataset originally had 10 informative features.
+- Ordinary Linear Regression
+- Ridge Regression
+- Lasso Regression
 
----
+This tests whether Lasso can help not only as a final predictive model, but also as a preprocessing and feature selection tool for other regression models.
 
-## Part C: fit and apply models to those features
+### Final comparison after feature selection
 
-The models are trained again, now using only the Lasso-selected features.
-
-This is a second-stage comparison:
-
-- train Linear Regression on reduced features
-- train Ridge on reduced features
-- train Lasso on reduced features
-- compare performance again
+![Final comparison after feature selection](last-plot-comparison.png)
 
 The new results are improved for ordinary and Ridge regression, and slightly improved for Lasso, supporting the idea that Lasso regression can be very beneficial when used as a feature selector.
 
 ---
 
-## Technical workflow of the notebook
+## Technical summary of the code
+
+The notebook is organized in a simple pipeline:
 
 1. install and import required libraries
-2. define a helper function for regression metrics
-3. generate one-feature synthetic data
-4. inject a few target outliers
-5. fit Linear, Ridge, and Lasso on outlier and clean versions
-6. visualize fitted lines
-7. generate a 100-feature synthetic regression dataset
-8. split into train and test sets
-9. fit Linear, Ridge, and Lasso
-10. compare predictions and coefficients
-11. inspect coefficient residuals
-12. choose a Lasso threshold
-13. mark selected features in a dataframe
-14. filter `X` to selected columns only
-15. retrain the models on the reduced feature set
-16. compare the updated results
+2. define a reusable regression evaluation function
+3. generate synthetic one-feature data
+4. inject outliers
+5. fit and compare ordinary, Ridge, and Lasso on the one-feature problem
+6. generate synthetic multi-feature regression data with known true coefficients
+7. split into train and test sets
+8. fit the three models on the full feature set
+9. compare predictions and coefficients
+10. use Lasso coefficients to identify important features
+11. reduce the feature matrix to selected features
+12. retrain the models on the reduced feature set
+13. compare performance again
 
----
-
-## Model usage summary
-
-### Ordinary Linear Regression
-
-Used as the baseline model. It estimates coefficients directly without regularization.
-
-Plain form:
-
-`y_hat = b0 + b1*x1 + b2*x2 + ... + bk*xk`
-
-### Ridge Regression
-
-Used to reduce coefficient magnitude and improve stability with many features.
-
-Objective idea:
-
-`minimize sum((y - y_hat)^2) + alpha * sum(wj^2)`
-
-This is `L2` regularization.
-
-### Lasso Regression
-
-Used both as a predictive model and as a feature selector.
-
-Objective idea:
-
-`minimize sum((y - y_hat)^2) + alpha * sum(|wj|)`
-
-This is `L1` regularization.
-
-Because of the absolute-value penalty, Lasso can push some coefficients exactly to zero, which is why it is useful for selecting important variables.
+This structure makes the notebook easy to follow and shows both the predictive and interpretability side of regularization.
 
 ---
 
 ## Figure analysis
 
-### `original-with-outlier.png`
+- `original-with-outlier.png` shows that only a few large outliers can visually distort the apparent trend.
+- `original-without-outlier.png` gives the clean baseline and makes the true linear structure easier to see.
+- `compare-predictions-with-outlier.png` shows that Lasso is less pulled by outliers than ordinary linear regression and Ridge in this setup.
+- `compare-predictions-without-outlier.png` shows that when outliers are removed, the fitted lines become much more similar.
+- `multiple-regression-predictionVSactual.png` shows that Lasso performs much better than ordinary linear regression and Ridge on the high-dimensional synthetic dataset.
+- `model-coefficients.png` shows that Lasso estimates are much closer to the true sparse coefficient pattern.
+- `model-coefficients-residuals.png` confirms that Lasso has smaller coefficient errors.
+- `last-plot-comparision.png` shows that using Lasso-selected features improves the reduced-model pipeline, especially for ordinary and Ridge regression.
 
-Shows the one-feature dataset after a few large outliers were added. The outliers heavily stretch the y-axis and visually separate from the main linear cloud.
+Overall, the project demonstrates two core ideas:
 
-### `original-without-outlier.png`
-
-Shows the same basic linear pattern without those injected outliers. The ideal line and noisy points are much more aligned.
-
-### `compare-predictions-with-outlier.png`
-
-Shows how the fitted lines react when outliers are present. Ordinary and Ridge are pulled more by the outliers, while Lasso stays closer to the underlying trend.
-
-### `compare-predictions-without-outlier.png`
-
-Shows the same models on clean data. All models become more similar, confirming that the strong distortion seen earlier came from the outliers.
-
-### `multiple-regression-predictionVSactual.png`
-
-Shows prediction-vs-actual comparisons for the multiple-regression case. A tighter concentration around the diagonal indicates stronger predictive performance.
-
-### `model-coefficients.png`
-
-Directly compares the learned coefficients against the ideal coefficients. Lasso is visually closer to the true sparse structure.
-
-### `model-coefficients-residuals.png`
-
-Shows coefficient errors relative to the ideal coefficients. Residuals closer to zero indicate better recovery of the true feature weights.
-
-### `last-plot-comparison.png`
-
-Summarizes the final comparison after feature selection, showing the effect of retraining on the reduced feature set.
+1. regularization can reduce sensitivity to noisy or extreme observations
+2. Lasso is especially useful when many features are irrelevant because it can act as both a predictor and a feature selector
 
 ---
 
-## Final conclusion
+## File structure
 
-This notebook shows two important ideas clearly:
+Make sure your repository contains the notebook and image files with these exact names in the same directory as `README.md`:
 
-1. **Outliers can strongly distort ordinary linear regression**
-2. **Lasso can be useful both for prediction and for feature selection**
+- `regularization-in-linear-regression.ipynb`
+- `original-with-outlier.png`
+- `original-without-outlier.png`
+- `compare-predictions-with-outlier.png`
+- `compare-predictions-without-outlier.png`
+- `multiple-regression-predictionVSactual.png`
+- `model-coefficients.png`
+- `model-coefficients-residuals.png`
+- `last-plot-comparision.png`
 
-In the simple one-feature case, Lasso is less affected by injected outliers than the other two models in this example.
+If the filenames stay exactly the same, the images will render correctly on GitHub after commit and push.
 
-In the high-dimensional multiple-regression case, Lasso performs best on the full feature set and also helps identify the important variables. After reducing the data to the selected features, the ordinary and Ridge models improve noticeably, confirming that feature selection can simplify the problem and improve downstream modeling.
+---
 
-Overall, the notebook demonstrates that regularization is not only about controlling coefficient size, but also about improving robustness and isolating useful signal from noisy or irrelevant variables.
+## How to run
+
+1. open the notebook
+2. install the required packages
+3. run cells in order
+4. generate the figures
+5. keep the generated image files in the repo beside the README
+
+---
+
+## Conclusion
+
+This notebook compares ordinary linear regression, Ridge regression, and Lasso regression in two controlled experiments.
+
+In the one-feature case with injected outliers, Lasso appears less affected by the extreme points and stays closer to the ideal trend.
+
+In the multi-feature case, Lasso strongly outperforms the other models because the data is sparse: only a small subset of features truly matters. Its coefficient estimates are closer to the true coefficients, and it can also be used to select a smaller feature subset that improves later modeling.
+
+So the main lesson is not just that regularization helps, but that different regularizers help in different ways:
+
+- Ridge helps by shrinking coefficients
+- Lasso helps by shrinking and selecting
+- ordinary linear regression has no penalty and is therefore more vulnerable in these settings
+```
