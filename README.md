@@ -91,31 +91,29 @@ So the threshold in that part is **not** detecting outliers statistically. It is
 
 The plot below shows the original noisy one-feature data together with the ideal line:
 
-`![Original data without outliers](images/original-without-outlier.png)`
+![Original data without outliers](images/original-without-outlier.png)
 
 ### Data with outliers
 
 The next plot shows the same dataset after adding a few large outliers:
 
-`![Original data with outliers](images/original-with-outlier.png)`
+![Original data with outliers](images/original-with-outlier.png)
 
 ### Prediction comparison with outliers
 
 The three regression models are fitted on the outlier-corrupted data and plotted against the original relationship:
 
-`![Comparison of predictions with outliers](images/compare-predictions-with-outlier.png)`
+![Comparison of predictions with outliers](images/compare-predictions-with-outlier.png)
 
 ### Prediction comparison without outliers
 
 The same models are then fitted on the clean data for comparison:
 
-`![Comparison of predictions without outliers](images/compare-predictions-without-outlier.png)`
+![Comparison of predictions without outliers](images/compare-predictions-without-outlier.png)
 
-We can see that ordinary linear and ridge regression performed similarly, while Lasso outperformed both.
-<br>
-Although the intercept is off for the Lasso fit line, it's slope is much closer to the ideal than the other fit lines.
-<br>
-All three lines were 'pulled up' by the outliers (not plotted here - compare to the plot above where the outliers are shown), with Lasso dampening that effect.
+We can see that ordinary linear and ridge regression performed similarly, while Lasso outperformed both.  
+Although the intercept is off for the Lasso fit line, its slope is much closer to the ideal than the other fit lines.  
+All three lines were pulled up by the outliers, with Lasso dampening that effect.
 
 ### Interpretation
 
@@ -131,38 +129,35 @@ In simple words:
 
 ### Multiple regression regularization and lasso feature selection
 
-Here I compare performances of the three linear regression methods and then use the Lasso result to select important features to use in another model.<br>
+Here I compare performances of the three linear regression methods and then use the Lasso result to select important features to use in another model.
 
 Note that:
-- Simple linear regression: one predictor
-y = b0 + b1 x1
-- Multiple linear regression: two or more predictors
-y = b0 + b1 x1 + b2 x2 + ... + bk xk
+
+- Simple linear regression: one predictor  
+  `y = b0 + b1 x1`
+- Multiple linear regression: two or more predictors  
+  `y = b0 + b1 x1 + b2 x2 + ... + bk xk`
 
 ### Synthetic regression data
 
 Creating synthetic regression data:
 
-n_samples=100 → create 100 data points
-
-n_features=100 → each point has 100 input features
-
-n_informative=10 → only 10 of those 100 features actually matter
-
-noise=10 → add random noise to the target values
-
-random_state=42 → makes the result reproducible
-
-coef=True → also return the true underlying coefficients
+- `n_samples=100` -> create 100 data points
+- `n_features=100` -> each point has 100 input features
+- `n_informative=10` -> only 10 of those 100 features actually matter
+- `noise=10` -> add random noise to the target values
+- `random_state=42` -> makes the result reproducible
+- `coef=True` -> also return the true underlying coefficients
 
 The data is built roughly like this, suitable for regression:
-y = b + w1*x1 + w2*x2 + ... + wk*xk + noise
+
+`y = b + w1*x1 + w2*x2 + ... + wk*xk + noise`
 
 This is called a regression dataset because the target `y` is continuous, and the task is to learn the mapping from features to numeric output.
 
 ### Why `coef=True` matters
 
-The dataset is synthetic, so the generator knows the true coefficients used to build the target.
+The dataset is synthetic, so the generator knows the true coefficients used to build the target.  
 That means we can compare:
 
 - learned coefficients from Linear / Ridge / Lasso
@@ -178,14 +173,14 @@ The three models are trained on the full 100-feature dataset and evaluated on a 
 
 ### Prediction vs actual plots
 
-`![Multiple regression prediction vs actual](images/multiple-regression-predictionVSactual.png)`
+![Multiple regression prediction vs actual](images/multiple-regression-predictionVSactual.png)
 
 ### Additional final comparison plot
 
-`![Final comparison plot](images/last-plot-comparison.png)`
+![Final comparison plot](images/last-plot-comparison.png)
 
-The results for ordinary and ridge regession are poor.<br>
-Explained variances are under 50%, and R^2 is very low.<br>
+The results for ordinary and ridge regression are poor.  
+Explained variances are under 50%, and `R^2` is very low.  
 However, the result for Lasso is stellar.
 
 ### Interpretation
@@ -204,9 +199,9 @@ This happens because:
 
 The notebook then compares the learned coefficients with the true ideal coefficients.
 
-`![Model coefficients](images/model-coefficients.png)`
+![Model coefficients](images/model-coefficients.png)
 
-`![Model coefficient residuals](images/model-coefficients-residuals.png)`
+![Model coefficient residuals](images/model-coefficients-residuals.png)
 
 We can see from the first plot how much closer the Lasso coefficients are to the ideal coefficients than for the other two models. An easier way to visualize the difference is to look at the residual errors, as in the second plot. Clearly the Lasso coefficient residuals are much closer to zero than the others.
 
@@ -264,7 +259,7 @@ Use Lasso to guess which features matter, then compare its guess with the real a
 
 ### What is being extracted
 
-The code is **not extracting coefficients** for later training.
+The code is **not extracting coefficients** for later training.  
 It is extracting **feature columns from `X`**.
 
 If `important_features` contains selected column indices, then:
@@ -338,6 +333,7 @@ The new results are improved for ordinary and Ridge regression, and slightly imp
 ## Model usage summary
 
 ### Ordinary Linear Regression
+
 Used as the baseline model. It estimates coefficients directly without regularization.
 
 Plain form:
@@ -345,20 +341,22 @@ Plain form:
 `y_hat = b0 + b1*x1 + b2*x2 + ... + bk*xk`
 
 ### Ridge Regression
+
 Used to reduce coefficient magnitude and improve stability with many features.
 
 Objective idea:
 
-`minimize  sum((y - y_hat)^2) + alpha * sum(wj^2)`
+`minimize sum((y - y_hat)^2) + alpha * sum(wj^2)`
 
 This is `L2` regularization.
 
 ### Lasso Regression
+
 Used both as a predictive model and as a feature selector.
 
 Objective idea:
 
-`minimize  sum((y - y_hat)^2) + alpha * sum(|wj|)`
+`minimize sum((y - y_hat)^2) + alpha * sum(|wj|)`
 
 This is `L1` regularization.
 
@@ -369,27 +367,35 @@ Because of the absolute-value penalty, Lasso can push some coefficients exactly 
 ## Figure analysis
 
 ### `original-with-outlier.png`
+
 Shows the one-feature dataset after a few large outliers were added. The outliers heavily stretch the y-axis and visually separate from the main linear cloud.
 
 ### `original-without-outlier.png`
+
 Shows the same basic linear pattern without those injected outliers. The ideal line and noisy points are much more aligned.
 
 ### `compare-predictions-with-outlier.png`
+
 Shows how the fitted lines react when outliers are present. Ordinary and Ridge are pulled more by the outliers, while Lasso stays closer to the underlying trend.
 
 ### `compare-predictions-without-outlier.png`
+
 Shows the same models on clean data. All models become more similar, confirming that the strong distortion seen earlier came from the outliers.
 
 ### `multiple-regression-predictionVSactual.png`
+
 Shows prediction-vs-actual comparisons for the multiple-regression case. A tighter concentration around the diagonal indicates stronger predictive performance.
 
 ### `model-coefficients.png`
+
 Directly compares the learned coefficients against the ideal coefficients. Lasso is visually closer to the true sparse structure.
 
 ### `model-coefficients-residuals.png`
+
 Shows coefficient errors relative to the ideal coefficients. Residuals closer to zero indicate better recovery of the true feature weights.
 
 ### `last-plot-comparison.png`
+
 Summarizes the final comparison after feature selection, showing the effect of retraining on the reduced feature set.
 
 ---
