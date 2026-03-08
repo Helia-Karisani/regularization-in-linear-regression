@@ -1,4 +1,4 @@
-```markdown
+
 # Regularization in Linear Regression
 
 This project studies how regularization changes linear regression behavior in two settings:
