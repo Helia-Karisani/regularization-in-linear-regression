@@ -91,25 +91,25 @@ So the threshold in that part is **not** detecting outliers statistically. It is
 
 The plot below shows the original noisy one-feature data together with the ideal line:
 
-`![Original data without outliers](original-without-outlier.png)`
+`![Original data without outliers](images/original-without-outlier.png)`
 
 ### Data with outliers
 
 The next plot shows the same dataset after adding a few large outliers:
 
-`![Original data with outliers](original-with-outlier.png)`
+`![Original data with outliers](images/original-with-outlier.png)`
 
 ### Prediction comparison with outliers
 
 The three regression models are fitted on the outlier-corrupted data and plotted against the original relationship:
 
-`![Comparison of predictions with outliers](compare-predictions-with-outlier.png)`
+`![Comparison of predictions with outliers](images/compare-predictions-with-outlier.png)`
 
 ### Prediction comparison without outliers
 
 The same models are then fitted on the clean data for comparison:
 
-`![Comparison of predictions without outliers](compare-predictions-without-outlier.png)`
+`![Comparison of predictions without outliers](images/compare-predictions-without-outlier.png)`
 
 We can see that ordinary linear and ridge regression performed similarly, while Lasso outperformed both.
 <br>
@@ -178,11 +178,11 @@ The three models are trained on the full 100-feature dataset and evaluated on a 
 
 ### Prediction vs actual plots
 
-`![Multiple regression prediction vs actual](multiple-regression-predictionVSactual.png)`
+`![Multiple regression prediction vs actual](images/multiple-regression-predictionVSactual.png)`
 
 ### Additional final comparison plot
 
-`![Final comparison plot](last-plot-comparison.png)`
+`![Final comparison plot](images/last-plot-comparison.png)`
 
 The results for ordinary and ridge regession are poor.<br>
 Explained variances are under 50%, and R^2 is very low.<br>
@@ -204,9 +204,9 @@ This happens because:
 
 The notebook then compares the learned coefficients with the true ideal coefficients.
 
-`![Model coefficients](model-coefficients.png)`
+`![Model coefficients](images/model-coefficients.png)`
 
-`![Model coefficient residuals](model-coefficients-residuals.png)`
+`![Model coefficient residuals](images/model-coefficients-residuals.png)`
 
 We can see from the first plot how much closer the Lasso coefficients are to the ideal coefficients than for the other two models. An easier way to visualize the difference is to look at the residual errors, as in the second plot. Clearly the Lasso coefficient residuals are much closer to zero than the others.
 
