@@ -344,7 +344,6 @@ Overall, the project demonstrates two core ideas:
 
 ## File structure
 
-Make sure your repository contains the notebook and image files with these exact names in the same directory as `README.md`:
 
 - `regularization-in-linear-regression.ipynb`
 - `original-with-outlier.png`
@@ -356,7 +355,6 @@ Make sure your repository contains the notebook and image files with these exact
 - `model-coefficients-residuals.png`
 - `last-plot-comparision.png`
 
-If the filenames stay exactly the same, the images will render correctly on GitHub after commit and push.
 
 ---
 
@@ -366,7 +364,6 @@ If the filenames stay exactly the same, the images will render correctly on GitH
 2. install the required packages
 3. run cells in order
 4. generate the figures
-5. keep the generated image files in the repo beside the README
 
 ---
 
@@ -383,4 +380,3 @@ So the main lesson is not just that regularization helps, but that different reg
 - Ridge helps by shrinking coefficients
 - Lasso helps by shrinking and selecting
 - ordinary linear regression has no penalty and is therefore more vulnerable in these settings
-```
